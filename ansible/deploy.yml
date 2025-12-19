@@ -8,7 +8,7 @@
       register: docker_check
       ignore_errors: true
 
-    - name: Install Docker if not present
+    - name: Install Docker ONLY if missing
       apt:
         name: docker.io
         state: present
