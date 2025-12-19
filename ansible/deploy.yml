@@ -3,11 +3,17 @@
   become: true
 
   tasks:
-    - name: Ensure Docker is installed
+    - name: Check if Docker is installed
+      command: docker --version
+      register: docker_check
+      ignore_errors: true
+
+    - name: Install Docker if not present
       apt:
         name: docker.io
         state: present
         update_cache: yes
+      when: docker_check.failed
 
     - name: Run Node App container
       docker_container:
@@ -18,3 +24,4 @@
         env:
           DB_PASSWORD: "{{ db_password }}"
           API_KEY: "{{ api_key }}"
+
