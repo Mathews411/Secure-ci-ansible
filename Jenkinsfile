@@ -2,11 +2,16 @@ pipeline {
     agent any
 
     environment {
+        // 🔐 Jenkins credentials
         DB_PASSWORD = credentials('db_password')
         API_KEY     = credentials('api_key')
+
+        // 🔐 STEP 2.5: Ansible Vault password from Jenkins
+        ANSIBLE_VAULT_PASSWORD = credentials('ansible_vault_pass')
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -24,7 +29,7 @@ pipeline {
                 sh '''
                 ansible-playbook ansible/deploy.yml \
                   -i ansible/inventory.ini \
-                  --extra-vars "db_password=${DB_PASSWORD} api_key=${API_KEY}"
+                  --vault-password-file <(echo "$ANSIBLE_VAULT_PASSWORD")
                 '''
             }
         }
@@ -32,7 +37,7 @@ pipeline {
 
     post {
         success {
-            echo '✅ CI + Ansible deployment successful'
+            echo '✅ CI + Ansible + Vault deployment successful'
         }
         failure {
             echo '❌ Pipeline failed'
