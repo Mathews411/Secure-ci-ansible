@@ -6,7 +6,7 @@ pipeline {
         DB_PASSWORD = credentials('db_password')
         API_KEY     = credentials('api_key')
 
-        // 🔐 STEP 2.5: Ansible Vault password from Jenkins
+        // 🔐 Ansible Vault password
         ANSIBLE_VAULT_PASSWORD = credentials('ansible_vault_pass')
     }
 
@@ -27,9 +27,14 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 sh '''
+                echo "$ANSIBLE_VAULT_PASSWORD" > /tmp/.vault_pass
+                chmod 600 /tmp/.vault_pass
+
                 ansible-playbook ansible/deploy.yml \
                   -i ansible/inventory.ini \
-                  --vault-password-file <(echo "$ANSIBLE_VAULT_PASSWORD")
+                  --vault-password-file /tmp/.vault_pass
+
+                rm -f /tmp/.vault_pass
                 '''
             }
         }
