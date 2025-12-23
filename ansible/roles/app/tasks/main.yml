@@ -1,0 +1,22 @@
+- name: Check if Docker is installed
+  command: docker --version
+  register: docker_check
+  ignore_errors: true
+
+- name: Install Docker ONLY if missing
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+  when: docker_check.failed
+
+- name: Run Node App container
+  docker_container:
+    name: secure-node-app
+    image: secure-node-app:1.0
+    state: started
+    restart_policy: always
+    env:
+      DB_PASSWORD: "{{ db_password }}"
+      API_KEY: "{{ api_key }}"
+
