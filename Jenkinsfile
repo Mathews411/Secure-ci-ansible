@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
     parameters {
         choice(
             name: 'ENV',
@@ -19,14 +19,6 @@ pipeline {
         API_KEY     = credentials('api_key')
         ANSIBLE_VAULT_PASSWORD = credentials('ansible_vault_pass')
     }
-    environment {
-        // 🔐 Jenkins credentials
-        DB_PASSWORD = credentials('db_password')
-        API_KEY     = credentials('api_key')
-
-        // 🔐 Ansible Vault password
-        ANSIBLE_VAULT_PASSWORD = credentials('ansible_vault_pass')
-    }
 
     stages {
 
@@ -42,21 +34,21 @@ pipeline {
             }
         }
 
-       stage('Deploy with Ansible') {
-    steps {
-        sh '''
-        echo "$ANSIBLE_VAULT_PASSWORD" > /tmp/.vault_pass
-        chmod 600 /tmp/.vault_pass
+        stage('Deploy with Ansible') {
+            steps {
+                sh '''
+                echo "$ANSIBLE_VAULT_PASSWORD" > /tmp/.vault_pass
+                chmod 600 /tmp/.vault_pass
 
-        ansible-playbook ansible/deploy.yml \
-          -i ansible/inventories/${ENV}/inventory.ini \
-          --vault-password-file /tmp/.vault_pass
+                ansible-playbook ansible/deploy.yml \
+                  -i ansible/inventories/${ENV}/inventory.ini \
+                  --vault-password-file /tmp/.vault_pass
 
-        rm -f /tmp/.vault_pass
-        '''
-	}
-}
-	}
+                rm -f /tmp/.vault_pass
+                '''
+            }
+        }
+    }
 
     post {
         success {
