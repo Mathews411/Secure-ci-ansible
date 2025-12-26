@@ -30,7 +30,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'cd app && docker build -t secure-node-app:${IMAGE_TAG} .'
+                sh 'cd app && docker build -t secure-node-app:${IMAGE_TAG ?: "1.0"} .'
             }
         }
 
