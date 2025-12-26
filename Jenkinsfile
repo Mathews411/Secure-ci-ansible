@@ -29,10 +29,13 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps {
-                sh 'cd app && docker build -t secure-node-app:${IMAGE_TAG ?: "1.0"} .'
-            }
+    steps {
+        script {
+            def tag = params.IMAGE_TAG?.trim() ?: '1.0'
+            sh "cd app && docker build -t secure-node-app:${tag} ."
         }
+    }
+}
 
         stage('Deploy with Ansible') {
             steps {
